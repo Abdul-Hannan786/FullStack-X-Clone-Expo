@@ -1,9 +1,9 @@
-import asynncHandler from "express-async-handler";
+import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 import { clerkClient, getAuth } from "@clerk/express";
 import Notification from "../models/notification.model.js";
 
-export const getUserProfile = asynncHandler(async (req, res) => {
+export const getUserProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
   const user = await User.findOne({ username });
 
@@ -14,7 +14,7 @@ export const getUserProfile = asynncHandler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const updateProfile = asynncHandler(async (req, res) => {
+export const updateProfile = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
   const user = await User.findOneAndUpdate({ clerkId: userId }, req.body, {
     new: true,
@@ -27,7 +27,7 @@ export const updateProfile = asynncHandler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const syncUser = asynncHandler(async (req, res) => {
+export const syncUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
 
   const existingUser = await User.findOne({ clerkId: userId });
@@ -52,7 +52,7 @@ export const syncUser = asynncHandler(async (req, res) => {
   res.status(201).json({ user, message: "user created successfully" });
 });
 
-export const getCurrentUser = asynncHandler(async (req, res) => {
+export const getCurrentUser = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
   const user = await User.findOne({ clerkId: userId });
   if (!user) {
@@ -62,7 +62,7 @@ export const getCurrentUser = asynncHandler(async (req, res) => {
   res.status(200).json({ user });
 });
 
-export const followUser = asynncHandler(async () => {
+export const followUser = asyncHandler(async () => {
   const userId = getAuth(req);
   const { targetUserId } = req.params;
 
@@ -104,11 +104,9 @@ export const followUser = asynncHandler(async () => {
     });
   }
 
-  res
-    .status(200)
-    .json({
-      message: isFollowing
-        ? "User unfollowed successfully"
-        : "User followed successfully",
-    });
+  res.status(200).json({
+    message: isFollowing
+      ? "User unfollowed successfully"
+      : "User followed successfully",
+  });
 });
