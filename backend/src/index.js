@@ -16,7 +16,13 @@ app.use(clerkMiddleware);
 
 app.get("/", (req, res) => res.send("Hello World"));
 app.use("/api/users", userRoutes);
-app.use("/api/posts", postRoutes)
+app.use("/api/posts", postRoutes);
+
+// error handling middleware
+app.use((err, req, res) => {
+  console.error("Unhandled error", err);
+  res.status(500).json({ error: err.message || "Internal server error" });
+});
 
 const startServer = async () => {
   try {

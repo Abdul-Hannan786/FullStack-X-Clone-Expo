@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
+import Comment from "../models/comment.model.js";
 import { getAuth } from "@clerk/express";
 import cloudinary from "../config/cloudinary.js";
 
@@ -102,4 +103,71 @@ export const createPost = asyncHandler(async (req, res) => {
   });
 
   res.status(201).json({ post });
+});
+
+export const likePost = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const { userId } = getAuth(req);
+
+  const user = await User.findOne({ clerkId: userId });
+  const post = await Post.findById(postId);
+
+  if (!user) {
+    return res.status(400).json({ error: "User not found" });
+  }
+
+  if (!post) {
+    return res.status(404).json({ error: "Post not found" });
+  }
+
+  const isLiked = post.likes.includes(user._id);
+  if (isLiked) {
+    // unlike
+    await Post.findByIdAndUpdate(postId, { $pull: { likes: user._id } });
+  } else {
+    // like
+    await Post.findByIdAndUpdate(postId, { $push: { likes: user._id } });
+
+    // create notification if not liking own post
+    if (post.user.toString() !== user._id.toString()) {
+      await Notification.create({
+        from: user._id,
+        to: post.user,
+        type: "like",
+        post: postId,
+      });
+    }
+  }
+
+  res.json({
+    message: isLiked ? "Post unliked successfully" : "Post liked successfully",
+  });
+});
+
+export const deletePost = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const { userId } = getAuth(req);
+
+  const user = await User.findOne({ clerkId: userId });
+  const post = await Post.findById(postId);
+
+  if (!user) {
+    return res.status(400).json({ error: "User not found" });
+  }
+
+  if (!post) {
+    return res.status(404).json({ error: "Post not found" });
+  }
+
+  const isOwner = post.user.toString() === user._id.toString();
+  if (!isOwner) {
+    return res
+      .status(403)
+      .json({ error: "You are not the owner of this post" });
+  }
+
+  await Comment.deleteMany({ post: postId });
+  await Post.findByIdAndDelete(postId);
+
+  res.status(200).jsoon({ message: "Post deleted successully" });
 });
