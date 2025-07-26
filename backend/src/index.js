@@ -30,22 +30,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-const startServer = async () => {
-  try {
-    await connectDB();
-
-    // listen for local development
-    if (ENV.NODE_ENV !== "production") {
-      app.listen(ENV.PORT, () =>
-        console.log("Server is up and running on PORT:", ENV.PORT)
-      );
-    }
-  } catch (error) {
-    console.error("Failed to start server:", error.message);
-    process.exit(1);
-  }
-};
-
-startServer();
-
-export default app;
+connectDB()
+  .then(() => {
+    app.listen(ENV.PORT, () => {
+      console.log(`⚙️  Server is running at port : ${ENV.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("MONGO DB connection failed !!! ", err);
+  });
