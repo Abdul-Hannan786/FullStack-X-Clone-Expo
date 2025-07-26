@@ -12,15 +12,19 @@ export const aj = arcjet({
     // bot detection - block all bots except search engines
     detectBot({
       mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE"],
+      allow: [
+        "CATEGORY:SEARCH_ENGINE",
+        // allow legitimate search engine bots
+        // see full list at https://arcjet.com/bot-list
+      ],
     }),
 
     // rate limiting with token bucket algorithm
     tokenBucket({
       mode: "LIVE",
-      refillRate: 10,
-      interval: 10,
-      capacity: 15,
+      refillRate: 10, // tokens added per interval
+      interval: 10, // interval in seconds (10 seconds)
+      capacity: 15, // maximum tokens in bucket
     }),
   ],
 });

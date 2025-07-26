@@ -13,12 +13,14 @@ import { arcjetMiddleware } from "./middleware/arcjet.middleware.js";
 
 const app = express();
 
-app.use(express.json());
 app.use(cors());
-app.use(clerkMiddleware);
+app.use(express.json());
+
+app.use(clerkMiddleware());
 app.use(arcjetMiddleware);
 
-app.get("/", (req, res) => res.send("Hello World"));
+app.get("/", (req, res) => res.send("Hello from server"));
+
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
@@ -26,16 +28,25 @@ app.use("/api/notifications", notificationRoutes);
 
 // error handling middleware
 app.use((err, req, res, next) => {
-  console.error("Unhandled error", err);
+  console.error("Unhandled error:", err);
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-connectDB()
-  .then(() => {
-    app.listen(ENV.PORT, () => {
-      console.log(`⚙️  Server is running at port : ${ENV.PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.log("MONGO DB connection failed !!! ", err);
-  });
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    // listen for local development
+    if (ENV.NODE_ENV !== "production") {
+      app.listen(ENV.PORT, () => console.log("Server is up and running on PORT:", ENV.PORT));
+    }
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+// export for vercel
+export default app;
