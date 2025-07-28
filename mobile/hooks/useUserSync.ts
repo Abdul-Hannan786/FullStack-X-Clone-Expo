@@ -10,19 +10,10 @@ export const useUserSync = () => {
 
   const syncUserMutation = useMutation({
     mutationFn: () => userApi.syncUser(api),
+
     onSuccess: (response: any) =>
       console.log("User synced successfully:", response.data.user),
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "User sync failed:",
-          error.response?.data,
-          error.response?.status
-        );
-      } else {
-        console.error("User sync failed:", error);
-      }
-    },
+    onError: (error: any) => console.error("User sync failed:", error),
   });
 
   // auto-sync user when signed in
