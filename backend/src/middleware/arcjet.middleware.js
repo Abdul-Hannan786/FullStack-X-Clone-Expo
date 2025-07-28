@@ -1,14 +1,19 @@
 import { aj } from "../config/arcjet.js";
-
-// Arcjet middleware for rate limiting, bot protection, and security
+import { getAuth } from "@clerk/express"; // or @clerk/clerk-sdk-node if using that
 
 export const arcjetMiddleware = async (req, res, next) => {
   try {
+    // ✅ Bypass Arcjet if user is authenticated via Clerk
+    const { userId } = getAuth(req);
+    if (userId) {
+      return next();
+    }
+
+    // Otherwise, run Arcjet protection
     const decision = await aj.protect(req, {
-      requested: 1, // each request consumes 1 token
+      requested: 1,
     });
 
-    // handle denied requests
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         return res.status(429).json({
@@ -28,7 +33,6 @@ export const arcjetMiddleware = async (req, res, next) => {
       }
     }
 
-    // check for spoofed bots
     if (
       decision.results.some(
         (result) => result.reason.isBot() && result.reason.isSpoofed()
@@ -43,7 +47,6 @@ export const arcjetMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Arcjet middleware error:", error);
-    // allow request to continue if Arcjet fails
-    next();
+    next(); // Let the request through if Arcjet fails
   }
 };
