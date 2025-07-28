@@ -8,13 +8,13 @@ import {
 } from "react-native";
 
 export default function Index() {
-  const { isLoading, handleSocialAuth } = useSocialAuth();
+  const { handleSocialAuth, isLoading } = useSocialAuth();
 
   return (
     <View className="flex-1 bg-white">
       <View className="flex-1 px-8 justify-between">
         <View className="flex-1 justify-center">
-          {/* Demo image */}
+          {/* DEMO IMAGE */}
           <View className="items-center">
             <Image
               source={require("../../assets/images/auth2.png")}
@@ -24,11 +24,11 @@ export default function Index() {
           </View>
 
           <View className="flex-col gap-2">
-            {/* Google signin button */}
+            {/* GOOGLE SIGNIN BTN */}
             <TouchableOpacity
+              className="flex-row items-center justify-center bg-white border border-gray-300 rounded-full py-3 px-6"
               onPress={() => handleSocialAuth("oauth_google")}
               disabled={isLoading}
-              className="flex-row items-center justify-center rounded-full bg-white border border-gray-300 py-3 px-3"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 1 },
@@ -38,7 +38,7 @@ export default function Index() {
               }}
             >
               {isLoading ? (
-                <ActivityIndicator size={"small"} color={"#000"} />
+                <ActivityIndicator size="small" color="#4285F4" />
               ) : (
                 <View className="flex-row items-center justify-center">
                   <Image
@@ -53,11 +53,11 @@ export default function Index() {
               )}
             </TouchableOpacity>
 
-            {/* Apple signin button */}
+            {/* APPLE SIGNIN ICON */}
             <TouchableOpacity
+              className="flex-row items-center justify-center bg-white border border-gray-300 rounded-full py-3 px-6"
               onPress={() => handleSocialAuth("oauth_apple")}
               disabled={isLoading}
-              className="flex-row items-center justify-center rounded-full bg-white border border-gray-300 py-3 px-3"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 1 },
@@ -67,12 +67,12 @@ export default function Index() {
               }}
             >
               {isLoading ? (
-                <ActivityIndicator size={"small"} color={"#000"} />
+                <ActivityIndicator size="small" color="#000" />
               ) : (
                 <View className="flex-row items-center justify-center">
                   <Image
                     source={require("../../assets/images/apple.png")}
-                    className="size-9 mr-3"
+                    className="size-8 mr-3"
                     resizeMode="contain"
                   />
                   <Text className="text-black font-medium text-base">
@@ -83,6 +83,7 @@ export default function Index() {
             </TouchableOpacity>
           </View>
 
+          {/* Terms and Privacy */}
           <Text className="text-center text-gray-500 text-xs leading-4 mt-6 px-2">
             By signing up, you agree to our{" "}
             <Text className="text-blue-500">Terms</Text>
